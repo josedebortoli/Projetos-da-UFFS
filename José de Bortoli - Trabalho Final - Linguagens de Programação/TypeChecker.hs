@@ -42,14 +42,14 @@ typeof ctx (Paren e) = typeof ctx e  -- novo typeof para usar em expressões que
 
 -- Regras de Tipos para Tuplas
 typeof ctx (Pair e1 e2) = case (typeof ctx e1, typeof ctx e2) of
-                            (Just t1, Just t2) -> Just (TPair t1 t2)
-                            _                  -> Nothing
+                            (Just t1, Just t2) -> Just (TPair t1 t2) -- deu certo: retorna um tipo produto (T1, T2)
+                            _                  -> Nothing -- falha: Um dos elementos tem erro de tipo
 typeof ctx (Fst e) = case typeof ctx e of 
-                       Just (TPair t1 t2) -> Just t1 
-                       _                  -> Nothing
+                       Just (TPair t1 t2) -> Just t1 -- retorna o tipo do primeiro componente
+                       _                  -> Nothing -- erro: tenta usar fst em algo que não é tupla (ex: fst 5)
 typeof ctx (Snd e) = case typeof ctx e of 
-                       Just (TPair t1 t2) -> Just t2 
-                       _                  -> Nothing
+                       Just (TPair t1 t2) -> Just t2 -- retorna o tipo do segundo componente
+                       _                  -> Nothing 
 
 typecheck :: Expr -> Expr 
 typecheck e = case typeof [] e of 

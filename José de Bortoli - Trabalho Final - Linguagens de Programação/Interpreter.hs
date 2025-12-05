@@ -82,14 +82,15 @@ step (App e1 e2) = App (step e1) e2 -- se o lado esquerdo (a função) não é u
 step (Paren e) = e   -- semanticamente, parênteses não fazem nada, apenas remove o "envelope" e retornamos a expressão de dentro.
 
 -- Steps para Tuplas
-step (Pair e1 e2) | not (isValue e1) = Pair (step e1) e2
-                  | not (isValue e2) = Pair e1 (step e2)
-
-step (Fst (Pair v1 v2)) | isValue v1 && isValue v2 = v1
-step (Fst e) = Fst (step e)
-
-step (Snd (Pair v1 v2)) | isValue v1 && isValue v2 = v2
-step (Snd e) = Snd (step e)
+-- Define a ordem de avaliação: da esquerda para a direita.
+step (Pair e1 e2) | not (isValue e1) = Pair (step e1) e2 -- 1. se o 1º elemento não é valor, reduz ele um passo.
+                  | not (isValue e2) = Pair e1 (step e2) -- 2. se o 1º já é valor, mas o 2º não, reduz o 2º.
+-- regra de computação para projeção (Fst)
+step (Fst (Pair v1 v2)) | isValue v1 && isValue v2 = v1 -- só extrai o valor se o argumento for um Par totalmente avaliado (v1 e v2 são valores).
+step (Fst e) = Fst (step e) -- se o argumento de Fst ainda não é um par de valores, reduz o argumento. Ex: Fst (If true (1,2) (3,4)) -> Fst (1,2)
+-- regra de computação para projeção (Snd)
+step (Snd (Pair v1 v2)) | isValue v1 && isValue v2 = v2 -- retorna o segundo elemento apenas se ambos os componentes do par forem valores.
+step (Snd e) = Snd (step e) -- tenta reduzir a expressão interna até que ela vire um Par.
 
 eval :: Expr -> Expr
 eval e = if isValue e then 
