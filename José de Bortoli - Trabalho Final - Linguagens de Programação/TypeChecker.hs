@@ -40,6 +40,16 @@ typeof ctx (App e1 e2) = case typeof ctx e1 of
                            _ -> Nothing 
 typeof ctx (Paren e) = typeof ctx e  -- novo typeof para usar em expressões que usam parênteses
 
+-- Regras de Tipos para Tuplas
+typeof ctx (Pair e1 e2) = case (typeof ctx e1, typeof ctx e2) of
+                            (Just t1, Just t2) -> Just (TPair t1 t2)
+                            _                  -> Nothing
+typeof ctx (Fst e) = case typeof ctx e of 
+                       Just (TPair t1 t2) -> Just t1 
+                       _                  -> Nothing
+typeof ctx (Snd e) = case typeof ctx e of 
+                       Just (TPair t1 t2) -> Just t2 
+                       _                  -> Nothing
 
 typecheck :: Expr -> Expr 
 typecheck e = case typeof [] e of 

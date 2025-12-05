@@ -42,3 +42,26 @@ No terminal.
 
         echo "true + 10" | ./lambda
 
+
+4. Exemplos com tuplas
+
+    Ex. 1: Criando uma tupla simples Verifica se o parser aceita a sintaxe
+
+        echo "(10, 20)" | ./lambda
+
+    Ex. 2: Projetando o primeiro elemento (fst) Testa a função fst
+
+        echo "fst (10, 20)" | ./lambda
+        
+    Ex. 3: Projetando o segundo elemento (snd) Testa a função snd.
+
+        echo "snd (10, 20)" | ./lambda
+
+    Ex. 4: Tupla com tipos mistos (Bool e Num) Prova que o sistema de tipos aceita pares heterogêneos.
+
+        echo "fst (true, 100)" | ./lambda
+
+    Ex. 5: Cálculos dentro da Tupla Verifica se a ordem de avaliação funciona (reduz os termos dentro do par antes de finalizar).
+
+        echo "(1 + 5, 3 * 4)" | ./lambda
+

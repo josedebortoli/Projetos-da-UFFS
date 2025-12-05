@@ -8,6 +8,7 @@ isValue BTrue  = True
 isValue BFalse = True 
 isValue (Num _) = True 
 isValue (Lam _ _ _) = True 
+isValue (Pair e1 e2) = isValue e1 && isValue e2 -- Par é valor se componentes forem valor
 isValue _ = False 
 
 subst :: String -> Expr -> Expr -> Expr 
@@ -36,6 +37,10 @@ subst x s (Or t1 t2) = Or (subst x s t1) (subst x s t2)       -- substitui x por
 subst x s (If e e1 e2) = If (subst x s e) (subst x s e1) (subst x s e2) -- garante que variáveis na condição ou nos ramos sejam atualizadas
 -- para parênteses: apenas atravessa os parênteses e aplica a substituição na expressão interna.
 subst x s (Paren e) = Paren (subst x s e)                     -- mantém a estrutura de parênteses, aplicando a substituição dentro dela
+-- Substituição para Tuplas
+subst x s (Pair e1 e2) = Pair (subst x s e1) (subst x s e2)
+subst x s (Fst e) = Fst (subst x s e)
+subst x s (Snd e) = Snd (subst x s e)
 
 step :: Expr -> Expr 
 step (Add (Num n1) (Num n2)) = Num (n1 + n2)
@@ -75,6 +80,16 @@ step (App e1 e2) = App (step e1) e2 -- se o lado esquerdo (a função) não é u
 
 -- regra de simplificação de parênteses
 step (Paren e) = e   -- semanticamente, parênteses não fazem nada, apenas remove o "envelope" e retornamos a expressão de dentro.
+
+-- Steps para Tuplas
+step (Pair e1 e2) | not (isValue e1) = Pair (step e1) e2
+                  | not (isValue e2) = Pair e1 (step e2)
+
+step (Fst (Pair v1 v2)) | isValue v1 && isValue v2 = v1
+step (Fst e) = Fst (step e)
+
+step (Snd (Pair v1 v2)) | isValue v1 && isValue v2 = v2
+step (Snd e) = Snd (step e)
 
 eval :: Expr -> Expr
 eval e = if isValue e then 
