@@ -1,0 +1,44 @@
+No terminal.
+
+1. Gerar o parser.hs
+
+    happy Parser.y
+
+2. Compilar o código
+
+    ghc Main.hs -o lambda
+
+3. Executar no terminal
+
+    Ex. 1: If-Then-Else
+            
+            echo "if true then 10 else 20" | ./lambda
+
+    Ex. 2: Função recursiva/aninhada
+
+            echo "(\x:Num -> (\y:Num -> x * y) 3) 4" | ./lambda
+
+    Ex. 3: Lambda com tipo
+
+            echo "(\x:Num -> x + 10) 5" | ./lambda
+
+    Ex. 4: Operações Lógicas (AND e OR)
+
+        echo "true && (false || true)" | ./lambda
+
+    Ex. 5: Aritmética com precedência (testa se a multiplicação ocorre antes da soma)
+
+        echo "2 + 3 * 4" | ./lambda
+
+    Ex. 6: Função de alta ordem (passando uma função como argumento para outra função)
+
+        echo "(\f:(Num -> Num) -> f 10) (\x:Num -> x * 2)" | ./lambda
+
+    Ex. 7: Teste de escopo (shadowing) (verifica se o interpretador protege a variável interna x da externa)
+
+        echo "(\x:Num -> (\x:Num -> x) 5) 10" | ./lambda
+
+    Ex. 8: Teste de erro de tipo (demonstra o TypeChecker barrando operações inválidas)
+
+        echo "true + 10" | ./lambda
+
